@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ericksonreyes/tara" default="build">
+    <property name="source" value="${project.basedir}/src/Tara"/>
+    <target name="build" depends="main"/>
+
+    <!-- ============================================  -->
+    <!-- Target: Main PHPCS target                     -->
+    <!-- ============================================  -->
+    <target name="main">
+        <phingcall target="Beautify source code"/>
+        <phingcall target="Check for duplicate codes"/>
+        <phingcall target="Check for php syntax errors"/>
+        <phingcall target="Check for runtime breaking dump calls"/>
+        <phingcall target="Check PSR2 coding standard compliance"/>
+        <phingcall target="Check for magic number violations"/>
+        <phingcall target="Check for clean code violations"/>
+        <phingcall target="Perform unit testing"/>
+        <phingcall target="Check for acceptance criteria failures"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPCBF                                -->
+    <!-- ============================================  -->
+    <target name="Beautify source code" description="PHP Code Beautifier">
+        <exec
+                logoutput="true"
+                checkreturn="false"
+                passthru="true"
+                command="bin/phpcbf
+                    -p
+                    --standard=PSR2
+                    '${project.basedir}/tests/spec/'
+                    '${project.basedir}/src/'
+                "
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPCPD                                -->
+    <!-- ============================================  -->
+    <target name="Check for duplicate codes" description="Generate pmd-cpd.xml using PHPCPD">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/phpcpd
+                    '${project.basedir}/tests/spec/'
+                    '${project.basedir}/src/'
+                "
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPLINT                               -->
+    <!-- ============================================  -->
+    <target name="Check for php syntax errors" description="Check for php syntax errors">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/parallel-lint
+                    -e php
+                    --colors
+                    '${project.basedir}/src/'
+                "
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPVDC                                -->
+    <!-- ============================================  -->
+    <target name="Check for runtime breaking dump calls"
+            description="Check for runtime breaking dump calls like var_dump, print_r and etc.">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/var-dump-check
+                    --symfony
+                    --laravel
+                    --doctrine
+                    --extensions php
+                    '${project.basedir}/src/'
+                "
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPCS                                 -->
+    <!-- ============================================  -->
+    <target name="Check PSR2 coding standard compliance" description="Check for coding standard violations">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/phpcs
+                    -p
+                    --colors
+                    --cache
+                    --standard=PSR2
+                    '${project.basedir}/src/'
+                "
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPMND                                 -->
+    <!-- ============================================  -->
+    <target name="Check for magic number violations" description="Detect clean code violations">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/phpmnd
+                    --hint
+                    --ansi
+                    --progress
+                    --include-numeric-string
+                    --non-zero-exit-on-violation
+                    '${project.basedir}/tests/'
+                    '${project.basedir}/src/'
+           "
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPMD                                 -->
+    <!-- ============================================  -->
+
+
+    <target name="Check for clean code violations" description="Detect clean code violations">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/phpmd
+                    ${project.basedir}
+                    ansi
+                    '${project.basedir}/phpmd.xml'
+                    --suffixes php
+                    --exclude
+                        ${project.basedir}/*.yml,
+                        ${project.basedir}/*.xml,
+                        ${project.basedir}/*.jpeg,
+                        ${project.basedir}/*.jpg,
+                        ${project.basedir}/*.json,
+                        ${project.basedir}/*.dist,
+                        ${project.basedir}/*.bak,
+                        ${project.basedir}/*.phar,
+                        ${project.basedir}/*.txt,
+                        ${project.basedir}/*.lock,
+                        ${project.basedir}/bin/,
+                        ${project.basedir}/build/,
+                        ${project.basedir}/specs/,
+                        ${project.basedir}/tests/,
+                        ${project.basedir}/vendor/
+                    "
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PhpSpec                               -->
+    <!-- ============================================  -->
+    <target name="Perform unit testing" description="Unit Testing">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/phpspec run --config '${project.basedir}/phpspec.yml'"
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: Behat                                 -->
+    <!-- ============================================  -->
+    <target name="Check for acceptance criteria failures" description="Acceptance Criteria Testing">
+        <exec
+                logoutput="true"
+                checkreturn="true"
+                passthru="true"
+                command="bin/behat --no-interaction --stop-on-failure --no-snippets --colors"
+        />
+    </target>
+
+</project>

@@ -1,0 +1,6 @@
+.git/
+/.idea
+vendor/
+bin/
+build/logs/*
+Docker/

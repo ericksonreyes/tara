@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  composer:
+    build:
+      context: .
+      dockerfile: Docker/composer.Dockerfile
+    volumes:
+      - './:/var/www/html:delegated'
+      - 'composer_cache:/tmp'
+    tty: true
+    container_name: 'tara-core-domain-composer'
+
+
+  php:
+    build:
+      context: .
+      dockerfile: Docker/php.Dockerfile
+    volumes:
+      - './:/var/www/html:delegated'
+      - 'composer_cache:/tmp'
+    tty: true
+    container_name: 'tara-core-domain-php'
+
+
+volumes:
+  composer_cache:
